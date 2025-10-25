@@ -42,8 +42,9 @@ if not st.session_state.authenticated:
     col1, col2 = st.columns([1, 3])
     with col1:
         if st.button("Submit", key="submit_password"):
-            # IMPORTANT: Change this password to something secure!
-            if password == "BullSale2025":
+            # Password stored securely in Streamlit Secrets (not in code)
+            correct_password = st.secrets.get("APP_PASSWORD", "")
+            if password == correct_password and correct_password != "":
                 st.session_state.authenticated = True
                 st.rerun()
             else:
@@ -605,9 +606,9 @@ with st.sidebar:
     st.markdown("---")
     
     # Developer options (uncomment if needed)
-    with st.expander("🔄 Start Fresh", expanded=False):
-        st.caption("Clear the conversation and start over.")
-        if st.button("Reset Conversation"):
+    with st.expander("⚙️ Developer Options", expanded=False):
+        st.caption("Reset the conversation for testing or debugging.")
+        if st.button("🔄 Reset Conversation"):
             st.session_state.clear()
             st.rerun()
 
