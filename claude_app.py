@@ -1,3 +1,6 @@
+# Add a comment at the TOP of claude_app.py
+# Line 2, add: # Updated branding - [current date/time]
+
 # ============================================================
 # 📘 CLOSE ENOUGH CATTLE CO. — CLAUDE SONNET 4.5 BULL SALE ASSISTANT
 # ------------------------------------------------------------
