@@ -14,6 +14,7 @@ import json
 import re
 from typing import List, Dict, Any
 from anthropic import Anthropic
+from datetime import datetime
 
 # ============================================================
 # 🧱 PAGE CONFIGURATION & GLOBAL STYLING (ORIGINAL CSS RESTORED)
@@ -23,6 +24,52 @@ st.set_page_config(
     page_icon="icon.png",
     layout="centered",
 )
+
+# ============================================================
+# 🔒 PASSWORD PROTECTION
+# ============================================================
+# Initialize authentication state
+if "authenticated" not in st.session_state:
+    st.session_state.authenticated = False
+
+# Show password screen if not authenticated
+if not st.session_state.authenticated:
+    st.title("🐂 Close Enough Cattle Co.")
+    st.subheader("Bull Sale Assistant - Testing Access")
+    
+    password = st.text_input("Enter access code:", type="password", key="password_input")
+    
+    col1, col2 = st.columns([1, 3])
+    with col1:
+        if st.button("Submit", key="submit_password"):
+            # IMPORTANT: Change this password to something secure!
+            if password == "BullSale2025":
+                st.session_state.authenticated = True
+                st.rerun()
+            else:
+                st.error("❌ Incorrect access code. Please contact Close Enough Cattle Co. for access.")
+    
+    st.info("🧪 **Testing Phase** - This tool is being evaluated for the 2025 bull sale.")
+    st.stop()
+
+# ============================================================
+# 🛡️ SESSION RATE LIMITING
+# ============================================================
+# Initialize session tracking
+if "session_start" not in st.session_state:
+    st.session_state.session_start = datetime.now()
+    st.session_state.query_count = 0
+
+# Check session limit (50 queries)
+if st.session_state.query_count >= 50:
+    st.error("⚠️ **Session limit reached** (50 queries). Please refresh the page to continue testing.")
+    st.info("This limit helps manage API costs during the testing phase. Thank you for your understanding!")
+    if st.button("Refresh Session"):
+        # Clear session state to allow reset
+        for key in list(st.session_state.keys()):
+            del st.session_state[key]
+        st.rerun()
+    st.stop()
 
 st.markdown(
     """
@@ -547,13 +594,22 @@ for m in st.session_state.messages:
     message_bubble(m["role"], m["content"])
 
 # ============================================================
-# ⚙️ DEVELOPER OPTIONS (SAFE TO COMMENT OUT)
+# ⚙️ SIDEBAR - TESTING PHASE INFO & DEVELOPER OPTIONS
 # ============================================================
-#with st.sidebar.expander("⚙️ Developer Options", expanded=False):
-#    st.caption("Reset the conversation for testing or debugging.")
-#    if st.button("🔄 Reset Conversation"):
-#        st.session_state.clear()
-#        st.rerun()
+with st.sidebar:
+    # Testing phase info
+    st.markdown("### 🧪 Testing Phase")
+    st.info(f"**Queries used:** {st.session_state.query_count}/50")
+    st.caption("This tool is being evaluated for the 2025 bull sale. Your feedback is valuable!")
+    
+    st.markdown("---")
+    
+    # Developer options (uncomment if needed)
+    with st.expander("🔄 Start Fresh", expanded=False):
+        st.caption("Clear the conversation and start over.")
+        if st.button("Reset Conversation"):
+            st.session_state.clear()
+            st.rerun()
 
 # ============================================================
 # 🧠 CLAUDE TOOL-CALLING LOOP (UP TO 5 CHAINED CALLS)
@@ -689,6 +745,9 @@ def run_agent(user_message: str) -> str:
 # ============================================================
 prompt = st.chat_input("What breeding objectives are you focusing on this year?")
 if prompt:
+    # Increment query counter for rate limiting
+    st.session_state.query_count += 1
+    
     message_bubble("user", prompt)
     st.session_state.messages.append({"role":"user","content":prompt})
 
