@@ -26,52 +26,8 @@ st.set_page_config(
 )
 
 # ============================================================
-# 🔒 PASSWORD PROTECTION
+# 🎨 GLOBAL STYLING - LOAD FIRST
 # ============================================================
-# Initialize authentication state
-if "authenticated" not in st.session_state:
-    st.session_state.authenticated = False
-
-# Show password screen if not authenticated
-if not st.session_state.authenticated:
-    st.title("🐂 Close Enough Cattle Co.")
-    st.subheader("Bull Sale Assistant - Testing Access")
-    
-    password = st.text_input("Enter access code:", type="password", key="password_input")
-    
-    col1, col2 = st.columns([1, 3])
-    with col1:
-        if st.button("Submit", key="submit_password"):
-            # Password stored securely in Streamlit Secrets (not in code)
-            correct_password = st.secrets.get("APP_PASSWORD", "")
-            if password == correct_password and correct_password != "":
-                st.session_state.authenticated = True
-                st.rerun()
-            else:
-                st.error("❌ Incorrect access code. Please contact Close Enough Cattle Co. for access.")
-    
-    st.info("🧪 **Testing Phase** - This tool is being evaluated for the 2025 bull sale.")
-    st.stop()
-
-# ============================================================
-# 🛡️ SESSION RATE LIMITING
-# ============================================================
-# Initialize session tracking
-if "session_start" not in st.session_state:
-    st.session_state.session_start = datetime.now()
-    st.session_state.query_count = 0
-
-# Check session limit (50 queries)
-if st.session_state.query_count >= 50:
-    st.error("⚠️ **Session limit reached** (50 queries). Please refresh the page to continue testing.")
-    st.info("This limit helps manage API costs during the testing phase. Thank you for your understanding!")
-    if st.button("Refresh Session"):
-        # Clear session state to allow reset
-        for key in list(st.session_state.keys()):
-            del st.session_state[key]
-        st.rerun()
-    st.stop()
-
 st.markdown(
     """
 <style>
@@ -106,6 +62,80 @@ h3{font-size:1.4rem!important;font-weight:700!important;margin-bottom:.5rem!impo
 """,
     unsafe_allow_html=True,
 )
+
+# ============================================================
+# 🔒 PASSWORD PROTECTION
+# ============================================================
+# Initialize authentication state
+if "authenticated" not in st.session_state:
+    st.session_state.authenticated = False
+
+# Show password screen if not authenticated
+if not st.session_state.authenticated:
+    # Header with logo and branding
+    col1, col2 = st.columns([1, 3])
+    with col1:
+        try:
+            st.image("logo.png", width=180)
+        except Exception:
+            pass
+    with col2:
+        st.markdown(
+            """
+    <div style='padding-top:18px;'>
+      <div class='company-name'>Fall 2025 Angus Bull Sale</div>
+      <div class='subtitle'>Bull Sale Assistant - Testing Access</div>
+    </div>
+    """,
+            unsafe_allow_html=True,
+        )
+    
+    st.markdown("<br>", unsafe_allow_html=True)
+    
+    # Password input with custom label styling
+    st.markdown(
+        "<div style='font-family:\"Lato\",sans-serif;font-size:1.05rem;font-weight:500;color:#3a2f21;margin-bottom:0.5rem;'>Enter access code:</div>",
+        unsafe_allow_html=True
+    )
+    password = st.text_input("Enter access code:", type="password", key="password_input", label_visibility="collapsed")
+    
+    col1, col2 = st.columns([1, 3])
+    with col1:
+        if st.button("Submit", key="submit_password"):
+            # Password stored securely in Streamlit Secrets (not in code)
+            correct_password = st.secrets.get("APP_PASSWORD", "")
+            if password == correct_password and correct_password != "":
+                # Clear everything and start fresh (forces collapsed sidebar)
+                for key in list(st.session_state.keys()):
+                    del st.session_state[key]
+                st.session_state.authenticated = True
+                st.session_state.query_count = 0
+                st.session_state.session_start = datetime.now()
+                st.rerun()
+            else:
+                st.error("❌ Incorrect access code. Please contact Close Enough Cattle Co. for access.")
+    
+    st.info("🧪 **Testing Phase** - This tool is being evaluated for the 2025 bull sale.")
+    st.stop()
+
+# ============================================================
+# 🛡️ SESSION RATE LIMITING
+# ============================================================
+# Initialize session tracking
+if "session_start" not in st.session_state:
+    st.session_state.session_start = datetime.now()
+    st.session_state.query_count = 0
+
+# Check session limit (50 queries)
+if st.session_state.query_count >= 50:
+    st.error("⚠️ **Session limit reached** (50 queries). Please refresh the page to continue testing.")
+    st.info("This limit helps manage API costs during the testing phase. Thank you for your understanding!")
+    if st.button("Refresh Session"):
+        # Clear session state to allow reset
+        for key in list(st.session_state.keys()):
+            del st.session_state[key]
+        st.rerun()
+    st.stop()
 
 def message_bubble(role, content):
     """Uniform chat bubble renderer."""
@@ -593,24 +623,6 @@ if "messages" not in st.session_state:
 # Render chat history
 for m in st.session_state.messages:
     message_bubble(m["role"], m["content"])
-
-# ============================================================
-# ⚙️ SIDEBAR - TESTING PHASE INFO & DEVELOPER OPTIONS
-# ============================================================
-with st.sidebar:
-    # Testing phase info
-    st.markdown("### 🧪 Testing Phase")
-    st.info(f"**Queries used:** {st.session_state.query_count}/50")
-    st.caption("This tool is being evaluated for the 2025 bull sale. Your feedback is valuable!")
-    
-    st.markdown("---")
-    
-    # Developer options (uncomment if needed)
-    with st.expander("⚙️ Developer Options", expanded=False):
-        st.caption("Reset the conversation for testing or debugging.")
-        if st.button("🔄 Reset Conversation"):
-            st.session_state.clear()
-            st.rerun()
 
 # ============================================================
 # 🧠 CLAUDE TOOL-CALLING LOOP (UP TO 5 CHAINED CALLS)
