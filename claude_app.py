@@ -1,6 +1,3 @@
-# Add a comment at the TOP of claude_app.py
-# Line 2, add: # Updated branding - [current date/time]
-
 # ============================================================
 # 📘 CLOSE ENOUGH CATTLE CO. — CLAUDE SONNET 4.5 BULL SALE ASSISTANT
 # ------------------------------------------------------------
@@ -202,7 +199,8 @@ bulls_columns = set(bulls.columns.str.strip())
 BULL_NAMES_SET = set(bulls["Bull_Name"].str.lower().tolist())
 
 CORE_TRAITS = [
-    "CED","BW","WW","YW","Milk","HP","CEM","CW","Marb","RE","Fat",
+    "CED","BW","WW","YW","RADG","DMI","YH","SC","Doc","HP","CEM","Milk","MW","MH",
+    "CW","Marb","Re","Fat",
     "DollarM","DollarB","DollarC","DollarW","DollarEN"
 ]
 ACC_NAMES = set([c for c in bulls_columns if c.startswith("ACC_") or c.endswith("_ACC")])
@@ -463,7 +461,7 @@ def get_top_bulls_tool(goal: str, top_n: int = 3) -> Dict[str, Any]:
     elif g == "heifer":
         display_traits = ["CED", "BW", "WW", "YW", "DollarB"]
     elif g == "maternal":
-        display_traits = ["CED", "BW", "Milk", "HP", "CEM", "DollarM", "DollarEN"]
+        display_traits = ["CED", "BW", "Milk", "MW", "HP", "MH", "CEM", "Doc", "DollarM", "DollarEN"]
     else:
         display_traits = ["CED", "BW", "WW", "YW", "Milk", "DollarC", "DollarB"]
     
