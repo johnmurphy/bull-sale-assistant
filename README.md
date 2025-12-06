@@ -1,2 +1,2 @@
 # bull-sale-assistant
-AI assistant for Close Enough Cattle Co. 2025 Fall Bull Sale
+AI-assisted analytics tool for exploring bull sale catalog data (Python, Streamlit)
