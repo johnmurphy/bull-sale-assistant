@@ -1,5 +1,5 @@
 # ============================================================
-# 📘 CLOSE ENOUGH CATTLE CO. — CLAUDE SONNET 4.5 BULL SALE ASSISTANT
+# CLOSE ENOUGH CATTLE CO. — CLAUDE SONNET 4.5 BULL SALE ASSISTANT
 # ------------------------------------------------------------
 # Streamlit application using Claude Sonnet 4.5 tool-calling on your
 # Angus bull sale CSV (EPD + ACC + demographics). Provides grounded,
@@ -17,7 +17,7 @@ from anthropic import Anthropic
 from datetime import datetime
 
 # ============================================================
-# 🧱 PAGE CONFIGURATION & GLOBAL STYLING (ORIGINAL CSS RESTORED)
+# PAGE CONFIGURATION & GLOBAL STYLING (ORIGINAL CSS RESTORED)
 # ============================================================
 st.set_page_config(
     page_title="Close Enough Cattle Co. Bull Sale Assistant",
@@ -26,7 +26,7 @@ st.set_page_config(
 )
 
 # ============================================================
-# 🎨 GLOBAL STYLING - LOAD FIRST
+# GLOBAL STYLING - LOAD FIRST
 # ============================================================
 st.markdown(
     """
@@ -64,7 +64,7 @@ h3{font-size:1.4rem!important;font-weight:700!important;margin-bottom:.5rem!impo
 )
 
 # ============================================================
-# 🔒 PASSWORD PROTECTION
+# PASSWORD PROTECTION
 # ============================================================
 # Initialize authentication state
 if "authenticated" not in st.session_state:
@@ -113,13 +113,13 @@ if not st.session_state.authenticated:
                 st.session_state.session_start = datetime.now()
                 st.rerun()
             else:
-                st.error("❌ Incorrect access code. Please contact Close Enough Cattle Co. for access.")
+                st.error("Incorrect access code. Please contact Close Enough Cattle Co. for access.")
     
-    st.info("🧪 **Testing Phase** - This tool is being evaluated for the 2025 bull sale.")
+    st.info("**Testing Phase** - This tool is being evaluated for the 2025 bull sale.")
     st.stop()
 
 # ============================================================
-# 🛡️ SESSION RATE LIMITING
+# SESSION RATE LIMITING
 # ============================================================
 # Initialize session tracking
 if "session_start" not in st.session_state:
@@ -128,7 +128,7 @@ if "session_start" not in st.session_state:
 
 # Check session limit (50 queries)
 if st.session_state.query_count >= 50:
-    st.error("⚠️ **Session limit reached** (50 queries). Please refresh the page to continue testing.")
+    st.error("**Session limit reached** (50 queries). Please refresh the page to continue testing.")
     st.info("This limit helps manage API costs during the testing phase. Thank you for your understanding!")
     if st.button("Refresh Session"):
         # Clear session state to allow reset
@@ -162,7 +162,7 @@ def message_bubble(role, content):
     st.markdown(f"<div class='{cls}'>{content}</div>", unsafe_allow_html=True)
 
 # ============================================================
-# 🐂 HEADER
+# HEADER
 # ============================================================
 col1, col2 = st.columns([1, 3])
 with col1:
@@ -184,14 +184,14 @@ with col2:
 st.markdown("<div style='margin-bottom:1rem;'></div>", unsafe_allow_html=True)
 
 # ============================================================
-# 📊 LOAD & PREPARE SALE DATA
+# LOAD & PREPARE SALE DATA
 # ============================================================
 @st.cache_data
 def load_data():
     try:
         return pd.read_csv("augmented_bull_epd_data.csv")
     except FileNotFoundError:
-        st.error("📦 File 'augmented_bull_epd_data.csv' not found.")
+        st.error("File 'augmented_bull_epd_data.csv' not found.")
         st.stop()
 
 bulls: pd.DataFrame = load_data()
@@ -213,13 +213,13 @@ def get_acc_value(row: pd.Series, trait: str):
     return None
 
 # ============================================================
-# 📜 SYSTEM PROMPT & RENDER RULES (SIMPLIFIED - NO REDUNDANCY)
+# SYSTEM PROMPT & RENDER RULES (SIMPLIFIED - NO REDUNDANCY)
 # ============================================================
 try:
     with open("instructions.txt") as f:
         system_prompt = f.read()
 except FileNotFoundError:
-    st.error("⚠️ Missing 'instructions.txt' — include it in the same folder.")
+    st.error("Missing 'instructions.txt' — include it in the same folder.")
     st.stop()
 
 RENDER_RULES = """
@@ -263,11 +263,11 @@ The |LINEBREAK| placeholders will be converted to line breaks automatically. Jus
 """
 
 # ============================================================
-# 🔐 CLAUDE MODEL CONFIG
+# CLAUDE MODEL CONFIG
 # ============================================================
 api_key = st.secrets.get("ANTHROPIC_API_KEY") or st.secrets.get("CLAUDE_API_KEY")
 if not api_key:
-    st.error("⚠️ Missing API key: set ANTHROPIC_API_KEY or CLAUDE_API_KEY in .streamlit/secrets.toml")
+    st.error("Missing API key: set ANTHROPIC_API_KEY or CLAUDE_API_KEY in .streamlit/secrets.toml")
     st.stop()
 
 client = Anthropic(api_key=api_key)
@@ -275,7 +275,7 @@ MODEL_PRIMARY = "claude-sonnet-4-5-20250929"
 MODEL_FALLBACK = "claude-3-5-sonnet-20241022"
 
 # ============================================================
-# 🧰 TOOL SCHEMA
+# TOOL SCHEMA
 # ============================================================
 TOOLS_SCHEMA = [
     {
@@ -362,7 +362,7 @@ def pick_goal(user_message: str) -> str:
     return "general"
 
 # ============================================================
-# 🧩 TOOL IMPLEMENTATIONS - OPTION B (ALL PIPES)
+# TOOL IMPLEMENTATIONS - OPTION B (ALL PIPES)
 # ============================================================
 def build_bull_payload(row: pd.Series, include_traits: List[str]=None) -> Dict[str, Any]:
     """
@@ -535,7 +535,7 @@ def dispatch_tool(tool_name: str, tool_input: Dict[str, Any]) -> Dict[str, Any]:
         return {"error": f"Unknown tool: {tool_name}"}
 
 # ============================================================
-# 🔍 FALLBACK & VALIDATION
+# FALLBACK & VALIDATION
 # ============================================================
 def validate_reply_names(reply: str) -> bool:
     """Check if reply contains real bull names."""
@@ -597,7 +597,7 @@ def render_markdown_from_payload(payload: Dict[str, Any]) -> str:
     return "\n\n---\n\n".join(blocks)
 
 # ============================================================
-# 💬 WELCOME + STATE
+# WELCOME + STATE
 # ============================================================
 welcome_text = """
 <div class='welcome-intro'>
@@ -626,7 +626,7 @@ for m in st.session_state.messages:
     message_bubble(m["role"], m["content"])
 
 # ============================================================
-# 🧠 CLAUDE TOOL-CALLING LOOP (UP TO 5 CHAINED CALLS)
+# CLAUDE TOOL-CALLING LOOP (UP TO 5 CHAINED CALLS)
 # ============================================================
 def run_agent(user_message: str) -> str:
     """
@@ -680,7 +680,7 @@ def run_agent(user_message: str) -> str:
                     return block.text
             return "I apologize, but I encountered an error processing your request."
         except Exception:
-            return f"⚠️ Error: {str(e)}"
+            return f"Error: {str(e)}"
     
     # Tool use loop (up to 5 iterations)
     step = 0
@@ -755,7 +755,7 @@ def run_agent(user_message: str) -> str:
     return "\n".join(text_content) if text_content else "I've analyzed the data but couldn't generate a response."
 
 # ============================================================
-# 💬 CHAT INPUT HANDLER (NO FILLER; GUARANTEED OUTPUT)
+# CHAT INPUT HANDLER (NO FILLER; GUARANTEED OUTPUT)
 # ============================================================
 prompt = st.chat_input("What breeding objectives are you focusing on this year?")
 if prompt:
@@ -770,7 +770,7 @@ if prompt:
         try:
             reply = run_agent(prompt)
         except Exception as e:
-            reply = f"⚠️ Error: {e}"
+            reply = f"Error: {e}"
 
     # If model is silent or names are invalid, do deterministic fallback
     if not reply or not reply.strip() or not validate_reply_names(reply):
